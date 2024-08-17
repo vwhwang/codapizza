@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.bignerdranch.android.codapizza.R
 import com.bignerdranch.android.codapizza.model.Pizza
 import com.bignerdranch.android.codapizza.model.Topping
-import com.bignerdranch.android.codapizza.model.ToppingPlacement
 import java.text.NumberFormat
 
 @Composable
@@ -54,23 +53,45 @@ private fun ToppingsList(
     onEditPizza: (Pizza) -> Unit,
     modifier: Modifier
 ) {
+    var toppingBeingAdded by rememberSaveable {
+        mutableStateOf<Topping?>(null)
+    }
+    toppingBeingAdded?.let { topping ->
+        ToppingPlacementDialog(
+            topping = topping,
+            onDismissRequest = {
+                toppingBeingAdded = null
+            },
+            onSetToppingPlacement = { placement ->
+                onEditPizza(
+                    pizza.withToppings(
+                        topping = topping,
+                        placement = placement
+                    )
+                )
+            }
+        )
+    }
+
+
     LazyColumn(modifier = modifier) {
         items(Topping.values()) { topping ->
             ToppingCell(
                 topping = topping,
                 placement = pizza.toppings[topping],
                 onClickTopping = {
-                    val isOnPizza = pizza.toppings[topping] != null
-                    onEditPizza(
-                        pizza.withToppings(
-                            topping = topping,
-                            placement = if (isOnPizza) {
-                                null
-                            } else {
-                                ToppingPlacement.All
-                            }
-                        )
-                    )
+//                    val isOnPizza = pizza.toppings[topping] != null
+//                    onEditPizza(
+//                        pizza.withToppings(
+//                            topping = topping,
+//                            placement = if (isOnPizza) {
+//                                null
+//                            } else {
+//                                ToppingPlacement.All
+//                            }
+//                        )
+//                    )
+                    toppingBeingAdded = topping
                 }
             )
         }
@@ -89,7 +110,7 @@ private fun OrderButton(
             NumberFormat.getCurrencyInstance()
         }
         val price = currencyFormatter.format(pizza.price)
-        val buttonText = stringResource(R.string.place_order_button) + price
+        val buttonText = stringResource(R.string.place_order_button, price)
         Text(text = buttonText.toUpperCase(Locale.current))
     }
 }
