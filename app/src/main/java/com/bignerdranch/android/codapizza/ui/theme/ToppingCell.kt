@@ -1,5 +1,6 @@
 package com.bignerdranch.android.codapizza.ui.theme
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -24,11 +25,14 @@ fun ToppingCell(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .clickable { onClickTopping() }
             .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
         Checkbox(
             checked = (placement != null),
-            onCheckedChange = { onClickTopping() }
+            onCheckedChange = {
+                onClickTopping()
+            }
         )
         Column(
             modifier = modifier
