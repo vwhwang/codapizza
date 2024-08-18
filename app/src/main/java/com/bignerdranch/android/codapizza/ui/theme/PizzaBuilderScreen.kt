@@ -20,6 +20,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import com.bignerdranch.android.codapizza.R
 import com.bignerdranch.android.codapizza.model.Pizza
+import com.bignerdranch.android.codapizza.model.PizzaSize
 import com.bignerdranch.android.codapizza.model.Topping
 import java.text.NumberFormat
 
@@ -30,7 +31,29 @@ fun PizzaBuilderScreen(
     var pizza by rememberSaveable {
         mutableStateOf(Pizza())
     }
+
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(modifier = modifier) {
+
+        (if (pizza.size == null) {
+            PizzaSize.SMALL
+        } else {
+            pizza.size
+        })?.let {
+            PizzaSizeDropdownMenu(
+                size = it,
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                onIconClicked = { expanded = true },
+                onSetPizzaSize = {size ->
+                    pizza = pizza.chooseSize(size)
+                }
+            )
+        }
+
         ToppingsList(
             pizza = pizza,
             onEditPizza = { pizza = it },
@@ -72,25 +95,12 @@ private fun ToppingsList(
             }
         )
     }
-
-
     LazyColumn(modifier = modifier) {
         items(Topping.values()) { topping ->
             ToppingCell(
                 topping = topping,
                 placement = pizza.toppings[topping],
                 onClickTopping = {
-//                    val isOnPizza = pizza.toppings[topping] != null
-//                    onEditPizza(
-//                        pizza.withToppings(
-//                            topping = topping,
-//                            placement = if (isOnPizza) {
-//                                null
-//                            } else {
-//                                ToppingPlacement.All
-//                            }
-//                        )
-//                    )
                     toppingBeingAdded = topping
                 }
             )
