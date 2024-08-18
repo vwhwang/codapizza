@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bignerdranch.android.codapizza.R
 import com.bignerdranch.android.codapizza.model.Pizza
@@ -24,6 +25,7 @@ import com.bignerdranch.android.codapizza.model.PizzaSize
 import com.bignerdranch.android.codapizza.model.Topping
 import java.text.NumberFormat
 
+@Preview
 @Composable
 fun PizzaBuilderScreen(
     modifier: Modifier = Modifier
@@ -96,6 +98,9 @@ private fun ToppingsList(
         )
     }
     LazyColumn(modifier = modifier) {
+        item {
+            PizzaHeroImage(pizza = pizza, modifier = Modifier.padding(16.dp))
+        }
         items(Topping.values()) { topping ->
             ToppingCell(
                 topping = topping,
