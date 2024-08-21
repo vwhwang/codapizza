@@ -1,11 +1,15 @@
 package com.bignerdranch.android.codapizza.ui.theme
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -25,6 +30,7 @@ import com.bignerdranch.android.codapizza.model.PizzaSize
 import com.bignerdranch.android.codapizza.model.Topping
 import java.text.NumberFormat
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PizzaBuilderScreen(
@@ -38,37 +44,43 @@ fun PizzaBuilderScreen(
         mutableStateOf(false)
     }
 
-    Column(modifier = modifier) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
+        }) { innerPadding ->
+        Column(modifier = modifier.padding(innerPadding)) {
+            (if (pizza.size == null) {
+                PizzaSize.SMALL
+            } else {
+                pizza.size
+            })?.let {
+                PizzaSizeDropdownMenu(
+                    size = it,
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    onIconClicked = { expanded = true },
+                    onSetPizzaSize = { size ->
+                        pizza = pizza.chooseSize(size)
+                    }
+                )
+            }
 
-        (if (pizza.size == null) {
-            PizzaSize.SMALL
-        } else {
-            pizza.size
-        })?.let {
-            PizzaSizeDropdownMenu(
-                size = it,
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                onIconClicked = { expanded = true },
-                onSetPizzaSize = {size ->
-                    pizza = pizza.chooseSize(size)
-                }
+            ToppingsList(
+                pizza = pizza,
+                onEditPizza = { pizza = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = true)
+            )
+            OrderButton(
+                pizza = pizza,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             )
         }
 
-        ToppingsList(
-            pizza = pizza,
-            onEditPizza = { pizza = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = true)
-        )
-        OrderButton(
-            pizza = pizza,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
     }
 }
 
@@ -118,9 +130,12 @@ private fun OrderButton(
     pizza: Pizza,
     modifier: Modifier
 ) {
+    val context = LocalContext.current
     Button(
         modifier = modifier,
-        onClick = { }) {
+        onClick = {
+            Toast.makeText(context, R.string.order_placed_toast, Toast.LENGTH_LONG).show()
+        }) {
         val currencyFormatter = remember {
             NumberFormat.getCurrencyInstance()
         }

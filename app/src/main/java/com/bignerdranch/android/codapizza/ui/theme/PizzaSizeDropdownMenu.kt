@@ -9,6 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +32,7 @@ fun PizzaSizeDropdownMenu(
             .wrapContentSize(Alignment.TopStart)
     ) {
         IconButton(onClick = { onIconClicked() }, modifier = Modifier.padding(8.dp)) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Pizza Size")
+            Icon(Icons.Default.ArrowDropDown, contentDescription = "Pizza Size")
         }
         Text(text = "current selected Pizza size is " + stringResource(size.label))
         DropdownMenu(
